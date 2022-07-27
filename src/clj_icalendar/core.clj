@@ -93,10 +93,10 @@
 
 
 (defn parse-ics
-  "Parses a .ICS file into a clojure map.
+  "Parses a .ICS file into a clojure map. file can be a path or url.
    There is a key :components, which is a list of maps, each map representing an event.
    On the top level, general data of the calendar is found."
-  [^java.net.URL file]
+  [file]
   (let [cal (Calendars/load file)]
     {:properties
      {:method         (-> cal .getMethod .getValue)
