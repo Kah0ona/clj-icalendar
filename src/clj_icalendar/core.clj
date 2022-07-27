@@ -2,8 +2,9 @@
   (:import (net.fortuna.ical4j.model Calendar DateTime Dur)
            (net.fortuna.ical4j.model.component VEvent)
            (net.fortuna.ical4j.model.property CalScale ProdId Uid Version XProperty Duration Description Method Url Location Organizer Name)
+           (net.fortuna.ical4j.util Calendars)
            (net.fortuna.ical4j.data CalendarOutputter)
-           (java.io StringWriter)
+           (java.io StringWriter File)
            (java.util Date TimeZone)))
 
 (defn create-cal
@@ -89,3 +90,40 @@
         output (.output co cal sw)
         _ (.close sw)]
     (.replaceAll (.toString sw) "\r" "")))
+
+
+(defn parse-ics
+  "Parses a .ICS file into a clojure map.
+   There is a key :components, which is a list of maps, each map representing an event.
+   On the top level, general data of the calendar is found."
+  [^java.net.URL file]
+  (let [cal (Calendars/load file)]
+    {:properties
+     {:method         (-> cal .getMethod .getValue)
+      :version        (-> cal .getVersion .getValue)
+      :product-id     (-> cal .getProductId .getValue)
+      :calendar-scale (-> cal .getCalendarScale .getValue)}
+     :components (mapv
+                  (fn [component]
+                    (into {}
+                          (mapv
+                           (fn [prop]
+                             [(keyword (.getName prop))
+                              (.getValue prop)])
+                           (.getProperties component))))
+                  (-> cal .getComponents))
+     :cal cal}))
+
+(comment
+
+  ;;example
+  (def path "/some/path.ics")
+
+  (def url (.toURL (.toURI (File. path))))
+
+  (def cal
+    (parse-ics url))
+
+  cal
+
+  )
