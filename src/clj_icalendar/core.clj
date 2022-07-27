@@ -108,7 +108,7 @@
                     (into {}
                           (mapv
                            (fn [prop]
-                             [(keyword (.getName prop))
+                             [(keyword (clojure.string/lower-case  (.getName prop)))
                               (.getValue prop)])
                            (.getProperties component))))
                   (-> cal .getComponents))
