@@ -102,7 +102,7 @@
      {:method         (-> cal .getMethod .getValue)
       :version        (-> cal .getVersion .getValue)
       :product-id     (-> cal .getProductId .getValue)
-      :calendar-scale (-> cal .getCalendarScale .getValue)}
+      :calendar-scale (some-> cal .getCalendarScale .getValue)}
      :components (mapv
                   (fn [component]
                     (into {}
@@ -112,7 +112,7 @@
                               (.getValue prop)])
                            (.getProperties component))))
                   (-> cal .getComponents))
-     :cal cal}))
+     :cal        cal}))
 
 (comment
 
